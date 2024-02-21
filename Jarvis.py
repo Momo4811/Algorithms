@@ -1,16 +1,7 @@
 import math
 import random
-import matplotlib.pyplot as plt
 
 def generateRandomPoints(n):
-    '''
-    Returns a list of random coordinates between 0 - 100
-            Parameters:
-                    n (int): the number of points plotted
-
-            Returns:
-                    myPoints (list): a list of 2D points
-    '''
     myPoints = []
 
     for i in range(n):
@@ -31,17 +22,7 @@ def calculateOrientation(p, q, r):
     else:
         return 0
 
-
-
 def findLeftMostPoint(points):
-    '''
-    Returns the left most coordinate in the set of points given
-            Parameters:
-                    points (list): list of coordinates
-
-            Returns:
-                    leftMostIndex (int): the index of the left most coordinate
-    '''
     leftMostIndex = 0
 
     for i in range(1, len(points)):
@@ -100,31 +81,6 @@ def jarvismarch(points):
 
     return outputSet
 
-def scatterPlotPoints(points):
-    xPoints = [point[0] for point in points]
-    yPoints = [point[1] for point in points]
-
-    for point in points:
-        plt.scatter(point[0], point[1])
-
-
-def plotConvexHull(points):
-    xPoints = [point[0] for point in outputSet]
-    yPoints = [point[1] for point in outputSet]
-
-    xPoints.append(xPoints[0])
-    yPoints.append(yPoints[0])
-
-    plt.plot(xPoints, yPoints)
-
 points = generateRandomPoints(15)
 outputSet = jarvismarch(points)
-
-scatterPlotPoints(points)
-plotConvexHull(points)
-
-plt.show()
-
-
-
-
+print(outputSet)
