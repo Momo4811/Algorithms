@@ -1,43 +1,18 @@
 from math import sqrt, pi, atan2
-import timeit
-import random
-import matplotlib
-
-class Stack:
-    def __init__(self):
-        #initialised as empty stack, infinite size
-        self.__values = []
-        self.__top = 0
-
-    def isEmpty(self):
-        return 0==self.__top
-    
-    def push(self,value):
-        self.__values[self.__top] = value
-        self.__top +=1
-
-    def pop(self):
-        val = self.peek()
-        if val is not None:
-            self.__top -= 1
-        return val
-    
-    def peek(self):
-        if not self.isEmpty():
-            return self.__values[self.__top]
-        return None
 
 class Point:
     def __init__(self,x,y):
         self.x = x
         self.y = y
+
     def calcAngle(self,point2):
         #cos x = (a . b) / |a| |b|
         return (atan2(point2.y-self.y, point2.x-self.x) + 2*pi) % (2 * pi)
+    
     def calcDistance(self,point2):
         return sqrt((point2.y-self.y)**2 + (point2.x-self.x)**2)
-
-class SymbolTableTree:
+    
+class PointSymbolTableTree:
     def __init__(self, key, value):
         self.__value = value
         self.__left = None
@@ -87,38 +62,10 @@ class SymbolTableTree:
             if self.__right is not None:
                 self.__right.put(key, value)
             else:
-                self.__right = SymbolTableTree(key, value)
+                self.__right = PointSymbolTableTree(key, value)
         else:
             if self.__left is not None:
                 self.__left.put(key, value)
             else:
-                self.__left = SymbolTableTree(key, value)
+                self.__left = PointSymbolTableTree(key, value)
      
-def akn_graham_scan(listOfPoints):
-    stack=Stack()
-    #find point with lowest y co-ordinate - if y is the same take lowest x
-    point0 = listOfPoints[0]
-    for current in listOfPoints:
-        if (current.y < point0.y) or ((current.y == point0.y) and (current.x < point0.x)):
-            point0 = current
-    
-    symTable = SymbolTableTree(listOfPoints[0].calcAngle(point0),listOfPoints[0])
-    #calculate angles
-    for current in listOfPoints:
-        symTable.put(current.calcAngle(point0),current)
-"""
-let points be the list of points
-let stack = empty_stack()
-
-find the lowest y-coordinate and leftmost point P0
-sort points by polar angle with P0, 
-if several points have the same polar angle 
-then only keep the farthest
-
-for point in points:
-    # pop the last point from the stack if we turn clockwise to reach this point
-    while count stack > 1 and ccw(next_to_top(stack), top(stack), point) <= 0:
-        pop stack
-    push point to stack
-end
-"""
