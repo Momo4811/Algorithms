@@ -117,7 +117,7 @@ def plotConvexHull(points):
 
     plt.plot(xPoints, yPoints)
 
-def getConvexHull(points):
+def grahamScan(points):
     convexHull = []
 
     convexHull.append(points[0])
@@ -145,7 +145,7 @@ mergeSort(points, 1, len(points) - 1)
  COULD DO SWAPPING AND ETC ON MAIN 'POINTS' LIST INSTEAD OF CREATING SEPERATE LIST FOR CONVEX HULL:
  CREATE A TEMP INDEX VARIABLE AND MOVE THROUGH POINTS ARRAY.
 '''
-convexHull = getConvexHull(points)
+convexHull = grahamScan(points)
 
 # Plotting
 scatterPlotPoints(points)

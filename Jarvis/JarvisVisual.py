@@ -2,37 +2,61 @@ import math
 import random
 import matplotlib.pyplot as plt
 
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
 def generateRandomPoints(n):
     myPoints = []
+
     for i in range(n):
-        myPoints.append([random.random() * 100, random.random() * 100])
+        myPoints.append(Point(random.randint(1, 100), random.randint(1, 100)))
+
     return myPoints
 
-def calculateOrientation(p, q, r):
-    crossProduct = (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1])
+def getCrossProduct(p, q, r):
+    crossProduct = (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x)
     return crossProduct
 
 def findLeftMostPoint(points):
     leftMostIndex = 0
+
     for i in range(1, len(points)):
         currentLeftMost = points[leftMostIndex]
         currentPoint = points[i]
 
         # Update to new left most point
-        if currentPoint[0] < currentLeftMost[0]:
+        if currentPoint.x < currentLeftMost.x:
             leftMostIndex = i
 
         # If multiple points have same x coord, prioritise largest y
-        elif currentPoint[0] == currentLeftMost[0]:
-            if currentPoint[1] > currentLeftMost[1]:
+        elif currentPoint.x == currentLeftMost.x:
+            if currentPoint.y > currentLeftMost.y:
                 leftMostIndex = i
 
     return leftMostIndex
 
-def distance(p, q):
-    return math.sqrt( math.pow(p[0] - q[0], 2) + math.pow(p[1] - q[1], 2) )
+def scatterPlotPoints(points):
+    xPoints = [point.x for point in points]
+    yPoints = [point.y for point in points]
 
-def jarvismarch(points):
+    for point in points:
+        plt.scatter(point.x, point.y)
+
+def manhattanDistance(p, q):
+    return abs(p.x - q.x) + abs(p.y - q.y)
+
+def plotConvexHull(points):
+    xPoints = [point.x for point in points]
+    yPoints = [point.y for point in points]
+
+    xPoints.append(xPoints[0])
+    yPoints.append(yPoints[0])
+
+    plt.plot(xPoints, yPoints)
+
+def jarvisMarch(points):
     '''
     Returns the list of points that lie on the convex outputSet (jarvis march algorithm)
             Parameters:
@@ -57,9 +81,9 @@ def jarvismarch(points):
                 continue
             # find the greatest left turn
             # in case of collinearity, consider the farthest point
-            orientation = calculateOrientation(points[p], points[r], points[q])
-            if orientation > 0 or (
-                    orientation == 0 and distance(points[p], points[r]) > distance(points[p], points[q])):
+            crossProduct = getCrossProduct(points[p], points[r], points[q])
+            if crossProduct > 0 or (
+                    crossProduct == 0 and manhattanDistance(points[p], points[r]) > manhattanDistance(points[p], points[q])):
                 q = r
 
         p = q
@@ -70,26 +94,10 @@ def jarvismarch(points):
 
     return outputSet
 
-def scatterPlotPoints(points):
-    xPoints = [point[0] for point in points]
-    yPoints = [point[1] for point in points]
+inputSet = generateRandomPoints(50)
+outputSet = jarvisMarch(inputSet)
 
-    for point in points:
-        plt.scatter(point[0], point[1])
-
-def plotConvexHull(points):
-    xPoints = [point[0] for point in outputSet]
-    yPoints = [point[1] for point in outputSet]
-
-    xPoints.append(xPoints[0])
-    yPoints.append(yPoints[0])
-
-    plt.plot(xPoints, yPoints)
-
-points = generateRandomPoints(15)
-outputSet = jarvismarch(points)
-
-scatterPlotPoints(points)
+scatterPlotPoints(inputSet)
 plotConvexHull(outputSet)
 
 plt.show()
