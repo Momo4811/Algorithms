@@ -8,10 +8,6 @@ class Point:
         self.x = x
         self.y = y
 
-    def __repr__(self):
-        return "(" + str(self.x) + ", " + str(self.y) + ")"
-
-
 def subArrayCopy(arr, subArr, start, end):
     subArrayIndex = 0
     for i in range(start, end + 1):
@@ -164,37 +160,36 @@ def findLeftMostPoint(points):
 
     return leftMostIndex
 
-
 def jarvisMarchModified(hulls):
-    # Start from leftmost point of all hulls
-    points = [hull[0] for hull in hulls]
-    leftMostHull = findLeftMostPoint(points)
-    outputSet = [points[leftMostHull]]
-    currentHull = leftMostHull
-
-    while True:
-        q = None
-
-        # For each point in all hulls, if it makes a smaller left turn, update q
-        for hullIndex in range(len(hulls)):
-            if hullIndex == currentHull:
-                continue
-            for point in hulls[hullIndex]:
-                crossProduct = getCrossProduct(outputSet[-1], point, q) if q else None
-                if q is None or crossProduct > 0 or \
-                        (crossProduct == 0 and
-                         manhattanDistance(outputSet[-1], point) < manhattanDistance(outputSet[-1], q)):
-                    q = point
-                    currentHull = hullIndex
-
-        # If we've found the first point again, break
-        if q == outputSet[0]:
+    bottomLeftPoints = [hull[0] for hull in hulls]
+    leftMostHullI = findLeftMostPoint(bottomLeftPoints)
+    
+    outputSet = [hulls[leftMostHullI][0]]
+    currentHull = leftMostHullI
+    currentPointI = 0
+    p = hulls[leftMostHullI][0]
+    q = hulls[leftMostHullI][1]
+    
+    while (True):
+        q = hulls[currentHull][(currentPointI + 1) % len(hulls[currentHull])]
+        
+        for hullI in range(len(hulls)):
+            for pointI in range(len(hulls[hullI])):
+                r = hulls[hullI][pointI]
+                
+                crossProduct = getCrossProduct(p, r, q)
+                if crossProduct > 0 or (
+                crossProduct == 0 and manhattanDistance(p, r) > manhattanDistance(p, q)):
+                    currentHull = hullI
+                    currentPointI = pointI
+                    q = hulls[hullI][pointI]
+                    
+        p = q
+        if p == outputSet[0]:
             break
-        else:
-            outputSet.append(q)
 
+        outputSet.append(q)
     return outputSet
-
 
 def jarvisMarch(points):
     '''
@@ -237,11 +232,7 @@ def jarvisMarch(points):
 
 
 def createSubsets(points):
-    t = 2
-    while len(points) % t == 2 or t < 3:
-        t *= 2
-
-    print(t)
+    t = 400
     subsets = []
 
     for i in range(0, len(points), t):
@@ -251,20 +242,13 @@ def createSubsets(points):
     return subsets
 
 
-points = generateRandomPoints(500)
-scatterPlotPoints(points)
+inputSet = generateRandomPoints(1600)
+scatterPlotPoints(inputSet)
 
-subsets = createSubsets(points)
+subsets = createSubsets(inputSet)
 hulls = [grahamScan(subset) for subset in subsets]
-# for hull in hulls:
-#     plotConvexHull(hull)
 
-hullPoints = []
-for hull in hulls:
-    for point in hull:
-        hullPoints.append(point)
-
-convexHull = jarvisMarch(hullPoints)
-plotConvexHull(convexHull)
+outputSet = jarvisMarchModified(hulls)
+plotConvexHull(outputSet)
 
 plt.show()
