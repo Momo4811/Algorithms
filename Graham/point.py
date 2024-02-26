@@ -4,20 +4,31 @@ class Point:
     def __init__(self,x,y):
         self.x = x
         self.y = y
-
-    def calcAngle(self,point2):
-        #cos x = (a . b) / |a| |b|
-        return (atan2(point2.y-self.y, point2.x-self.x) + 2*pi) % (2 * pi)
     
     def calcDistance(self,point2):
-        return sqrt((point2.y-self.y)**2 + (point2.x-self.x)**2)
+        return abs(point2.x-self.x) + abs(point2.y-self.y)
     
-class PointSymbolTableTree:
+    def __repr__(self):
+        return "("+str(self.x)+","+str(self.y)+")"
+
+class HashTable:
+    pass
+
+class PointSymbolTable: #technically a binary tree
     def __init__(self, key, value):
         self.__value = value
         self.__left = None
         self.__right = None
         self.__key = key
+    
+    def valuesToList(self):#in order traversal to list
+        list = []
+        if self.__left is not None:
+            list.extend(self.__left.valuesToList())
+        list.append(self.__value)
+        if self.__right is not None:
+            list.extend(self.__right.valuesToList())
+        return list
     
     def getLeft(self):
         return self.__left
@@ -56,16 +67,17 @@ class PointSymbolTableTree:
     
     def put(self, key, value, ref):
         if self.__key == key:
+            #always keep furthest point from ref
             if value.calcDistance(ref) > self.__value.calcDistance(ref):
                 self.setValue(value)
         elif self.__key < key:
             if self.__right is not None:
-                self.__right.put(key, value)
+                self.__right.put(key, value, ref)
             else:
-                self.__right = PointSymbolTableTree(key, value)
+                self.__right = PointSymbolTable(key, value)
         else:
             if self.__left is not None:
-                self.__left.put(key, value)
+                self.__left.put(key, value, ref)
             else:
-                self.__left = PointSymbolTableTree(key, value)
+                self.__left = PointSymbolTable(key, value)
      
