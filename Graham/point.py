@@ -5,7 +5,7 @@ class Point:
     
     def calcDistance(self,point2):
         return abs(point2.x-self.x) + abs(point2.y-self.y)
-
+    
 class PointSymbolTable: #technically a binary tree
     def __init__(self, key, value):
         self.key = key
