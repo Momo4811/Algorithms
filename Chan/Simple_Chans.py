@@ -82,26 +82,6 @@ def getCrossProduct(p, q, r):
     crossProduct = (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x)
     return crossProduct
 
-
-def findBottomLeftMostPoint(points):
-    minIndex = 0
-
-    for i in range(1, len(points)):
-        currentMin = points[minIndex]
-        currentPoint = points[i]
-
-        # Update to lowest point
-        if currentPoint.y < currentMin.y:
-            minIndex = i
-
-        # If multiple points have same y coord, prioritise left most point
-        elif currentPoint.y == currentMin.y:
-            if currentPoint.x < currentMin.x:
-                minIndex = i
-
-    return minIndex
-
-
 def scatterPlotPoints(points):
     xPoints = [point.x for point in points]
     yPoints = [point.y for point in points]
@@ -125,7 +105,7 @@ def plotConvexHull(points):
 
 
 def grahamScan(points):
-    bottomLeftmostPoint = findBottomLeftMostPoint(points)
+    bottomLeftmostPoint = findLeftMostPoint(points)
 
     points[bottomLeftmostPoint], points[0] = points[0], points[bottomLeftmostPoint]
     mergeSort(points, 1, len(points) - 1)
