@@ -51,38 +51,6 @@ class PointSymbolTable: #technically a binary tree
             else:
                 self.left = PointSymbolTable(key, value)
     
-class Stack:
-    def __init__(self):
-        #initialised as empty stack, infinite size
-        self.values = []
-        self.top = -1
-
-    def isEmpty(self):
-        return 0==self.top
-    
-    def push(self,value):
-        self.values.append(value)
-        self.top += 1
-
-    def pop(self):
-        if self.isEmpty():
-            return None
-        self.top -= 1
-        return self.values.pop()
-    
-    def peek(self):
-        if self.isEmpty():
-            return None
-        return self.values[self.top]
-    
-    def peekNext(self):
-        if self.__top > 0:
-            return self.values[self.top-1]
-        return None
-    
-    def size(self):
-        return self.top+1
-
 def cross_product(p1,p2,p3):
     return (p2.x - p1.x)*(p3.y - p1.y) - (p3.x - p1.x)*(p2.y - p1.y)
 
@@ -90,7 +58,7 @@ def getAngle(p1,p2):
     return math.atan2(p2.y - p1.y, p2.x - p1.x)
 
 def akn_graham_scan(listOfPoints):
-    stack=Stack()
+    stack=[]
 
     #find point with lowest y co-ordinate - if y is the same take lowest x
     point0 = listOfPoints[0]
@@ -108,11 +76,11 @@ def akn_graham_scan(listOfPoints):
     
     sortedPoints = [point0] + symTable.valuesToList()
     #push first two points onto stack
-    stack.push(sortedPoints[0])
-    stack.push(sortedPoints[1])
+    stack.append(sortedPoints[0])
+    stack.append(sortedPoints[1])
     for i in range(2,len(sortedPoints)):
-        while stack.size() > 1 and cross_product(stack.peekNext(),stack.peek(),sortedPoints[i]) <= 0:
+        while len(stack) > 1 and cross_product(stack[-2],stack[-1],sortedPoints[i]) <= 0:
                 #if < 0 then we are turning right so pop the last point from the stack
                 stack.pop()
-        stack.push(sortedPoints[i])
-    return stack.values
+        stack.append(sortedPoints[i])
+    return stack

@@ -8,6 +8,7 @@ class Point:
         self.x = x
         self.y = y
 
+
 def subArrayCopy(arr, subArr, start, end):
     subArrayIndex = 0
     for i in range(start, end + 1):
@@ -81,26 +82,6 @@ def getCrossProduct(p, q, r):
     crossProduct = (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x)
     return crossProduct
 
-
-def findBottomLeftMostPoint(points):
-    minIndex = 0
-
-    for i in range(1, len(points)):
-        currentMin = points[minIndex]
-        currentPoint = points[i]
-
-        # Update to lowest point
-        if currentPoint.y < currentMin.y:
-            minIndex = i
-
-        # If multiple points have same y coord, prioritise left most point
-        elif currentPoint.y == currentMin.y:
-            if currentPoint.x < currentMin.x:
-                minIndex = i
-
-    return minIndex
-
-
 def scatterPlotPoints(points):
     xPoints = [point.x for point in points]
     yPoints = [point.y for point in points]
@@ -124,7 +105,7 @@ def plotConvexHull(points):
 
 
 def grahamScan(points):
-    bottomLeftmostPoint = findBottomLeftMostPoint(points)
+    bottomLeftmostPoint = findLeftMostPoint(points)
 
     points[bottomLeftmostPoint], points[0] = points[0], points[bottomLeftmostPoint]
     mergeSort(points, 1, len(points) - 1)
@@ -160,95 +141,77 @@ def findLeftMostPoint(points):
 
     return leftMostIndex
 
+
+def binary_search(hull, p):
+    left, right = 0, len(hull) - 1
+    while abs(right - left) > 1:
+        mid = (left + right) // 2
+        crossProduct = getCrossProduct(p, hull[left], hull[mid])
+        if crossProduct < 0 or (
+                crossProduct == 0 and manhattanDistance(p, hull[mid]) > manhattanDistance(p, hull[left])):
+            left = mid
+        else:
+            right = mid
+            
+    #two points left        
+    crossProduct = getCrossProduct(p, hull[left], hull[right])
+    if crossProduct < 0 or (
+                crossProduct == 0 and manhattanDistance(p, hull[right]) > manhattanDistance(p, hull[left])):
+        return right
+    else:
+        return left
+
 def jarvisMarchModified(hulls):
     bottomLeftPoints = [hull[0] for hull in hulls]
     leftMostHullI = findLeftMostPoint(bottomLeftPoints)
-    
+
     outputSet = [hulls[leftMostHullI][0]]
     currentHull = leftMostHullI
     currentPointI = 0
     p = hulls[leftMostHullI][0]
-    q = hulls[leftMostHullI][1]
     
-    while (True):
+    while True:
         q = hulls[currentHull][(currentPointI + 1) % len(hulls[currentHull])]
-        
+
         for hullI in range(len(hulls)):
-            for pointI in range(len(hulls[hullI])):
-                r = hulls[hullI][pointI]
-                
-                crossProduct = getCrossProduct(p, r, q)
-                if crossProduct > 0 or (
-                crossProduct == 0 and manhattanDistance(p, r) > manhattanDistance(p, q)):
-                    currentHull = hullI
-                    currentPointI = pointI
-                    q = hulls[hullI][pointI]
-                    
+            pointI = binary_search(hulls[hullI], p)
+            r = hulls[hullI][pointI]
+
+            crossProduct = getCrossProduct(p, q, r)
+            if crossProduct < 0 or (
+                    crossProduct == 0 and manhattanDistance(p, r) > manhattanDistance(p, q)):
+                currentHull = hullI
+                currentPointI = pointI
+                q = hulls[hullI][pointI]
+
         p = q
         if p == outputSet[0]:
             break
 
-        outputSet.append(q)
-    return outputSet
+        outputSet.append(p)
 
-def jarvisMarch(points):
-    '''
-    Returns the list of points that lie on the convex outputSet (jarvis march algorithm)
-            Parameters:
-                    points (list): a list of 2D points
-
-            Returns:
-                    outputSet (list): a list of 2D points
-    '''
-
-    leftMostPoint = findLeftMostPoint(points)
-    outputSet = []
-
-    origin = points[leftMostPoint]
-    outputSet.append(origin)
-
-    p = leftMostPoint
-
-    while (True):
-        q = (p + 1) % len(points)
-        for r in range(len(points)):
-            if r == p:
-                continue
-            # find the greatest left turn
-            # in case of collinearity, consider the farthest point
-            crossProduct = getCrossProduct(points[p], points[r], points[q])
-            if crossProduct > 0 or (
-                    crossProduct == 0 and manhattanDistance(points[p], points[r]) > manhattanDistance(points[p],
-                                                                                                      points[q])):
-                q = r
-
-        p = q
-        if p == leftMostPoint:
-            break
-
-        outputSet.append(points[q])
-
+    # in case of failure
     return outputSet
 
 
-def createSubsets(points):
-    t = 400
+def createSubsets(inputSet):
+    m = int(math.sqrt(len(inputSet)))
+
+    #ensures minimum subset length is at least 3
+    while len(inputSet) % m < 3:
+        m += 1
+
     subsets = []
 
-    for i in range(0, len(points), t):
-        subset = points[i: i + t]
+    #creates n/m subsets of size m
+    for i in range(0, len(inputSet), m):
+        subset = inputSet[i: i + m]
         subsets.append(subset)
 
     return subsets
 
 
-inputSet = generateRandomPoints(1600)
-scatterPlotPoints(inputSet)
-
-subsets = createSubsets(inputSet)
-hulls = [grahamScan(subset) for subset in subsets]
-
-outputSet = jarvisMarchModified(hulls)
-plotConvexHull(outputSet)
-
-plt.show()
+def chanScan(inputSet):
+    subsets = createSubsets(inputSet)
+    hulls = [grahamScan(subset) for subset in subsets]
+    return jarvisMarchModified(hulls)
