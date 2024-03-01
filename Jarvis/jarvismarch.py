@@ -1,15 +1,23 @@
 import math
 import random
+import matplotlib.pyplot as plt
+
+class Point:
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
 
 def generateRandomPoints(n):
     myPoints = []
+
     for i in range(n):
-        myPoints.append([random.random() * 100, random.random() * 100])
+        myPoints.append(Point(random.randint(1, 100), random.randint(1, 100)))
 
     return myPoints
 
 def calculateOrientation(p, q, r):
-        crossProduct = (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1])
+        crossProduct = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
+
         
         # Clockwise
         if (crossProduct > 0):
@@ -28,18 +36,34 @@ def findLeftMostPoint(points):
                 currentPoint = points[i]
                 
                 # Update to new left most point
-                if currentPoint[0] < currentLeftMost[0]:
+                if currentPoint.x < currentLeftMost.x:
                         leftMostIndex = i
                 
                 # If multiple points have same x coord, prioritise largest y
-                elif currentPoint[0] == currentLeftMost[0]:
-                        if currentPoint[1] > currentLeftMost[1]:
+                elif currentPoint.x == currentLeftMost.x:
+                        if currentPoint.y > currentLeftMost.y:
                                 leftMostIndex = i
                         
         return leftMostIndex
 
-def distancesquare(p, q):
-        return math.pow(p[0] - q[0], 2) + math.pow(p[1] - q[1], 2)
+def scatterPlotPoints(points):
+    xPoints = [point.x for point in points]
+    yPoints = [point.y for point in points]
+
+    for point in points:
+        plt.scatter(point.x, point.y)
+
+def distance(p, q):
+    return abs(p.x - q.x) + abs(p.y - q.y)
+
+def plotConvexHull(points):
+    xPoints = [point.x for point in points]
+    yPoints = [point.y for point in points]
+
+    xPoints.append(xPoints[0])
+    yPoints.append(yPoints[0])
+
+    plt.plot(xPoints, yPoints)
 
 def jarvismarch(inputSet):      
     '''
@@ -62,7 +86,13 @@ def jarvismarch(inputSet):
     while True:
         q = (p + 1) % len(inputSet)
         for i in range(len(inputSet)):
-                if calculateOrientation(inputSet[p], inputSet[i], inputSet[q]) == 2:
+                if i == p:
+                        continue
+                output = calculateOrientation(inputSet[p], inputSet[i], inputSet[q])
+                if output == 0 and distance(inputSet[p], inputSet[i]) > distance(inputSet[p], inputSet[q]):
+                        q = i
+                        
+                elif output == 2:
                         q = i
         p = q
         if p == leftMostPoint:
@@ -71,3 +101,12 @@ def jarvismarch(inputSet):
         outputSet.append(inputSet[p])
 
     return outputSet
+
+
+inputSet = generateRandomPoints(8)
+outputSet = jarvismarch(inputSet)
+
+scatterPlotPoints(inputSet)
+plotConvexHull(outputSet)
+
+plt.show()
