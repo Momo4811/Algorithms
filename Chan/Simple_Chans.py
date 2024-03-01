@@ -152,9 +152,14 @@ def binary_search(hull, p):
             left = mid
         else:
             right = mid
-
-    return right if getCrossProduct(p, hull[left], hull[right]) < 0 else left
-
+            
+    #two points left        
+    crossProduct = getCrossProduct(p, hull[left], hull[right])
+    if crossProduct < 0 or (
+                crossProduct == 0 and manhattanDistance(p, hull[right]) > manhattanDistance(p, hull[left])):
+        return right
+    else:
+        return left
 
 def jarvisMarchModified(hulls):
     bottomLeftPoints = [hull[0] for hull in hulls]
