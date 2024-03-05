@@ -1,10 +1,17 @@
+# Reusable data structures and functions for the algorithms
 class Point:
     def __init__(self,x,y):
         self.x = x
         self.y = y
-    
-    def calcDistance(self,point2):
-        return abs(point2.x-self.x) + abs(point2.y-self.y)
+
+    def __repr__(self) -> str:
+          return f"{self.x},{self.y}"
+
+def distance(p, q):
+    return abs(p.x - q.x) + abs(p.y - q.y)
+
+def cross_product(p,q,r):
+    return (q.x - p.x)*(r.y - p.y) - (r.x - p.x)*(q.y - p.y)
     
 class PointSymbolTable: #technically a binary tree
     def __init__(self, key, value):
@@ -13,16 +20,25 @@ class PointSymbolTable: #technically a binary tree
         self.left = None
         self.right = None
     
-    def valuesToList(self):#in order traversal to list
+    # in order traversal to list
+    def valuesToList(self):
         return (self.left.valuesToList() if self.left else []) + [self.value] + (self.right.valuesToList() if self.right else [])
     
-    def get(self, key):#normal binary tree get 
-        return self.value if self.key == key else (self.right.get(key) if self.key < key else self.left.get(key))
-    
-    def put(self, key, value, ref):#normal binary tree put
+    # normal binary tree get
+    def get(self, key): 
         if self.key == key:
-            #always keep furthest point from ref
-            self.value = value if value.calcDistance(ref) > self.value.calcDistance(ref) else self.value
+            return self.value
+        else:
+            if self.key < key:
+                return self.right.get(key)
+            else:
+                return self.left.get(key)
+
+    # normal binary tree put
+    def put(self, key, value, ref):
+        if self.key == key:
+            # always keep furthest point from reference point
+            self.value = value if distance(value, ref) > distance(self.value, ref) else self.value
         elif self.key < key:
             if self.right is not None:
                 self.right.put(key, value, ref)

@@ -7,16 +7,17 @@ class Point:
         self.x = x
         self.y = y
 
-def generateRandomPoints(n):
-    myPoints = []
+    def __repr__(self) -> str:
+          return f"{self.x},{self.y}"
 
-    for i in range(n):
-        myPoints.append(Point(random.randint(1, 100), random.randint(1, 100)))
+def distance(p, q):
+    return abs(p.x - q.x) + abs(p.y - q.y)
 
-    return myPoints
+def cross_product(p,q,r):
+    return (q.x - p.x)*(r.y - p.y) - (r.x - p.x)*(q.y - p.y)
 
 def calculateOrientation(p, q, r):
-        crossProduct = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y)
+        crossProduct = cross_product(p,q,r)
 
         
         # Clockwise
@@ -44,26 +45,7 @@ def findLeftMostPoint(points):
                         if currentPoint.y > currentLeftMost.y:
                                 leftMostIndex = i
                         
-        return leftMostIndex
-
-def scatterPlotPoints(points):
-    xPoints = [point.x for point in points]
-    yPoints = [point.y for point in points]
-
-    for point in points:
-        plt.scatter(point.x, point.y)
-
-def distance(p, q):
-    return abs(p.x - q.x) + abs(p.y - q.y)
-
-def plotConvexHull(points):
-    xPoints = [point.x for point in points]
-    yPoints = [point.y for point in points]
-
-    xPoints.append(xPoints[0])
-    yPoints.append(yPoints[0])
-
-    plt.plot(xPoints, yPoints)
+        return leftMostIndex\
 
 def jarvismarch(inputSet):      
     '''
@@ -103,9 +85,36 @@ def jarvismarch(inputSet):
     return outputSet
 
 
-inputSet = generateRandomPoints(8)
-outputSet = jarvismarch(inputSet)
 
+
+def generateRandomPoints(n):
+    myPoints = []
+
+    for i in range(n):
+        myPoints.append(Point(random.randint(1, 1000), random.randint(1, 1000)))
+
+    return myPoints
+
+def plotConvexHull(points):
+    xPoints = [point.x for point in points]
+    yPoints = [point.y for point in points]
+
+    xPoints.append(xPoints[0])
+    yPoints.append(yPoints[0])
+
+    plt.plot(xPoints, yPoints)
+
+def scatterPlotPoints(points):
+    xPoints = [point.x for point in points]
+    yPoints = [point.y for point in points]
+
+    for point in points:
+        plt.scatter(point.x, point.y)
+
+
+inputSet = generateRandomPoints(2000)
+outputSet = jarvismarch(inputSet)
+print(outputSet)
 scatterPlotPoints(inputSet)
 plotConvexHull(outputSet)
 
