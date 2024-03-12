@@ -14,7 +14,6 @@ class PointSymbolTable: #technically a binary tree
     def put(self, key, value:int, ref, arr):#normal binary tree put - value in this context is the array index
         if self.key == key:
             #always keep furthest point from ref
-            print(self.value)
             self.value = value if calcDistance(arr[value],ref) > calcDistance(arr[self.value],ref) else self.value
         elif self.key < key:
             if self.right is not None:
@@ -52,11 +51,7 @@ def akn_graham_scan(listOfPoints):
     #calculate angles then sort by angle using symbol table
     for i in range (1,len(listOfPoints)):
         if listOfPoints[i] != point0:
-            print(i)
             symTable.put(sort_key(point0,listOfPoints[i]), i, point0, listOfPoints)
-
-    for index in symTable.valuesToList():
-        print(listOfPoints[index])
         
     sortedPoints = [point0] + [listOfPoints[index] for index in symTable.valuesToList()]
     #push first two points onto stack
